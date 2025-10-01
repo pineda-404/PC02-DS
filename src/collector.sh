@@ -2,12 +2,9 @@
 
 set -euo pipefail
 
-TARGETS=${TARGETS:-"https://example.com"}
+TARGETS=${TARGETS:-"https://google.com"}
 TIMEOUT=${TIMEOUT:-5}
-OUTPUT_FILE="../out/raw_metrics.csv"
-
-mkdir -p out
-
+OUTPUT_FILE=${OUTPUT_FILE:-"out/raw_metrics.csv"}
 # Funcion para recolectar metricas de la URL
 collector_metricas() {
     local url=$1
@@ -22,7 +19,7 @@ EOF
     echo "Consultando: $url"
     # Hacer peticion y capturar metricas
     local metricas
-    metricas=$(curl -w "@$format_file" -o /dev/null -s --max-time "$TIMEOUT" "$url" 2>/dev/null)
+    metricas=$(curl -L -w "@$format_file" -o /dev/null -s --max-time "$TIMEOUT" "$url" 2>/dev/null)
 
     if [ $? -eq 0 ]; then
         echo "$url,$metricas"
