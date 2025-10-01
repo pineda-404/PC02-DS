@@ -1,0 +1,15 @@
+# Archivos generados
+out/
+dist/
+
+# Logs y temporales
+*.log
+*.tmp
+
+# Configuración local
+.env
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+*~
