@@ -16,7 +16,6 @@ collector_metricas() {
 %{http_code},%{time_total},%{time_connect},%{time_starttransfer}
 EOF
 
-    echo "Consultando: $url"
     # Hacer peticion y capturar metricas
     local metricas
     metricas=$(curl -L -w "@$format_file" -o /dev/null -s --max-time "$TIMEOUT" "$url" 2>/dev/null)
@@ -24,7 +23,6 @@ EOF
     if [ $? -eq 0 ]; then
         echo "$url,$metricas"
     else
-        # Si el comando falló, manejamos el error.
         echo "$url,000,0,0,0"
     fi
 
@@ -38,7 +36,7 @@ echo "url,status_code,time_total,time_connect,time_starttransfer" >"$OUTPUT_FILE
 IFS=',' read -ra URL_ARRAY <<<"$TARGETS"
 
 for url in "${URL_ARRAY[@]}"; do
-    # Remover espacios
+    # Remover espacios en blanco: {url1, url2} ---> {url1,url2}
     url=$(echo "$url" | xargs)
 
     metricas=$(collector_metricas "$url")
