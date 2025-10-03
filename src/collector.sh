@@ -2,16 +2,23 @@
 
 set -euo pipefail
 
-TARGETS=${TARGETS:-"https://google.com"}
+TARGETS=${TARGETS:-"https://google.com,https://httpbin.org/status/404,https://example.com"}
 TIMEOUT=${TIMEOUT:-5}
 OUTPUT_FILE=${OUTPUT_FILE:-"out/raw_metrics.csv"}
+
+# Trap para limpieza de archivos temporales
+cleanup() {
+    rm -f /tmp/curl_format_* 2>/dev/null || true
+}
+trap cleanup EXIT INT TERM
+
 # Funcion para recolectar metricas de la URL
 collector_metricas() {
     local url=$1
     local format_file
     format_file=$(mktemp)
 
-    # Formato para curl -w
+    # Formato para salida de curl -w
     cat >"$format_file" <<'EOF'
 %{http_code},%{time_total},%{time_connect},%{time_starttransfer}
 EOF
