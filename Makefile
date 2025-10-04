@@ -1,9 +1,14 @@
 # Makefile
 
-.PHONY: tools build test run clean
+.PHONY: help tools build test run clean
 
 SHELL := /bin/bash
 OUT_DIR := out
+
+help: ## Mostrar ayuda
+	@echo "Targets disponibles:"
+	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | \
+		sed -E 's/^([a-zA-Z_-]+):.*?## (.*)/  make \1 \t- \2/'
 
 tools: ## Verificar herramientas necesarias
 	@echo "Verificando herramientas..."
