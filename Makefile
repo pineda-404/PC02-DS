@@ -23,8 +23,13 @@ build: ## Preparar directorios de salida para métricas
 	@mkdir -p $(OUT_DIR)
 
 test: tools ## Ejecutar pruebas automáticas con bats
-	@echo "--> Ejecutando pruebas..."
-	@bats tests/
+	@echo "--> Ejecutando suite de pruebas..."
+	@if command -v bats >/dev/null; then \
+		bats tests/; \
+	else \
+		echo "ERROR: bats no está instalado. Instalar con: npm install -g bats"; \
+		exit 1; \
+	fi
 
 run: build ## Ejecutar colector de métricas
 	@echo "--> Ejecutando colector de métricas..."
