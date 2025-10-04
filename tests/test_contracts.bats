@@ -28,3 +28,11 @@ teardown() {
     latency=$(awk -F',' 'NR==2 {print $3}' "$OUTPUT_FILE")
     (($(echo "$latency < 2.0" | bc -l)))
 }
+
+@test "contrato negativo: URL 404 debe registrarse correctamente" {
+    export TARGETS="https://www.google.com/404"
+    run bash src/collector.sh
+
+    [ "$status" -eq 0 ]
+    grep -q ",404," "$OUTPUT_FILE"
+}
