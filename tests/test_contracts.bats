@@ -19,3 +19,12 @@ teardown() {
     code=$(awk -F',' 'NR==2 {print $2}' "$OUTPUT_FILE")
     [[ "$code" == "200" ]] || [[ "$code" == "301" ]]
 }
+
+@test "contrato: GitHub debe ser rapido (< 2s)" {
+    export TARGETS="https://github.com"
+    run bash src/collector.sh
+
+    [ "$status" -eq 0 ]
+    latency=$(awk -F',' 'NR==2 {print $3}' "$OUTPUT_FILE")
+    (($(echo "$latency < 2.0" | bc -l)))
+}
