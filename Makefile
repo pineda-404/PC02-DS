@@ -12,9 +12,10 @@ help: ## Mostrar ayuda
 
 tools: ## Verificar herramientas necesarias
 	@echo "Verificando herramientas..."
-	@command -v curl >/dev/null || { echo "ERROR: curl no instalado"; exit 1; }
-	@command -v awk >/dev/null || { echo "ERROR: awk no instalado"; exit 1; }
-	@command -v bats >/dev/null || echo "ADVERTENCIA: bats no instalado"
+	@command -v curl >/dev/null || { echo "ERROR: curl no está instalado"; exit 1; }
+	@command -v awk >/dev/null || { echo "ERROR: awk no está instalado"; exit 1; }
+	@command -v grep >/dev/null || { echo "ERROR: grep no está instalado"; exit 1; }
+	@command -v bats >/dev/null || echo "ADVERTENCIA: bats no está instalado"
 	@echo "Herramientas OK"
 
 build: ## Preparar directorios de salida para métricas
