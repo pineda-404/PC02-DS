@@ -36,3 +36,12 @@ teardown() {
     [ "$status" -eq 0 ]
     grep -q ",404," "$OUTPUT_FILE"
 }
+
+@test "contrato negativo: timeout no debe detener ejecucion" {
+    export TARGETS="https://httpbin.org/delay/10"
+    export TIMEOUT=2
+    run bash src/collector.sh
+
+    [ "$status" -eq 0 ]
+    grep -q ",000," "$OUTPUT_FILE"
+}
