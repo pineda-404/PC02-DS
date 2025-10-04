@@ -2,6 +2,13 @@
 
 set -euo pipefail
 
+# Cargar .env si existe
+if [ -f .env ]; then
+    set -a
+    source .env
+    set +a
+fi
+
 TARGETS=${TARGETS:-"https://google.com,https://httpbin.org/status/404,https://example.com"}
 TIMEOUT=${TIMEOUT:-5}
 OUTPUT_FILE=${OUTPUT_FILE:-"out/raw_metrics.csv"}

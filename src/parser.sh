@@ -2,6 +2,13 @@
 
 set -euo pipefail
 
+# Cargar .env si existe
+if [ -f .env ]; then
+    set -a
+    source .env
+    set +a
+fi
+
 INPUT_CSV=${INPUT_CSV:-"out/raw_metrics.csv"}
 OUTPUT_REPORT="out/report.txt"
 BUDGET_MS=${BUDGET_MS:-500}

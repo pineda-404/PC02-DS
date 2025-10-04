@@ -2,6 +2,13 @@
 
 set -euo pipefail
 
+# Cargar .env si existe
+if [ -f .env ]; then
+    set -a
+    source .env
+    set +a
+fi
+
 INPUT_CSV=${INPUT_CSV:-"out/raw_metrics.csv"}
 OUTPUT_PERCENTILES="out/percentiles.txt"
 
@@ -13,7 +20,7 @@ fi
 
 # Extraer tiempos, ordenarlos y guardar en archivo temporal
 TEMP_FILE=$(mktemp)
-trap "rm -f ${TEMP_FILE}" EXIT
+trap 'rm -f ${TEMP_FILE}' EXIT
 
 # Extraer columna time_total, saltar header y errores (tiempo 0)
 tail -n +2 "$INPUT_CSV" | cut -d',' -f3 | grep -v "^0$" | sort -n >"$TEMP_FILE"
