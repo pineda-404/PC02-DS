@@ -32,8 +32,14 @@ test: tools ## Ejecutar pruebas automáticas con bats
 	fi
 
 run: build ## Ejecutar colector de métricas
-	@echo "--> Ejecutando colector de métricas..."
+	@echo "--> Recolectando métricas..."
 	@bash src/collector.sh
+	@echo ""
+	@echo "Generando reporte..."
+	@bash src/parser.sh
+	@echo ""
+	@echo "=== Resultados ==="
+	@cat $(OUT_DIR)/report.txt
 
 clean: ## Limpiar archivos generados en el directorio de salida
 	@echo "Limpiando..."
