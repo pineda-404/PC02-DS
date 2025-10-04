@@ -22,3 +22,23 @@ tail -n +2 "$INPUT_CSV" | cut -d',' -f2 | sort | uniq -c | while read count code
     echo "  Codigo $code: $count URLs" >>"$OUTPUT_REPORT"
 done
 echo "" >>"$OUTPUT_REPORT"
+
+# URLs que exceden umbral
+echo "URLs que exceden umbral de ${BUDGET_MS}ms:" >>"$OUTPUT_REPORT"
+excede=0
+
+# Lee los valores de $INPUT_CSV
+while IFS=',' read -r url _ time_total rest; do
+    [[ "$time_total" == "0" ]] && continue
+
+    time_ms=$(awk -v t="$time_total" 'BEGIN {printf "%.2f", t * 1000}')
+
+    if (($(awk -v t="$time_ms" -v b="$BUDGET_MS" 'BEGIN {print (t > b)}'))); then
+        echo "  - $url: ${time_ms}ms" >>"$OUTPUT_REPORT"
+        excede=$((excede + 1))
+    fi
+done < <(tail -n +2 "$INPUT_CSV")
+
+if [ "$excede" -eq 0 ]; then
+    echo "  Ninguna URL excede el umbral" >>"$OUTPUT_REPORT"
+fi
