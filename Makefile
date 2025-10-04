@@ -1,9 +1,11 @@
 # Makefile
 
-.PHONY: help tools build test run clean
+.PHONY: help tools build test run pack clean
 
 SHELL := /bin/bash
 OUT_DIR := out
+DIST := dist
+RELEASE ?= v1.0.0-sprint3
 
 help: ## Mostrar ayuda
 	@echo "Targets disponibles:"
@@ -42,7 +44,15 @@ run: build ## Ejecutar colector de métricas
 	@echo "=== Resultados ==="
 	@cat $(OUT_DIR)/report.txt
 
+pack: build test ## Generar paquete reproducible en dist/
+	@echo "Generando paquete $(RELEASE)..."
+	@mkdir -p $(DIST)
+	@tar -czf $(DIST)/http-latency-monitor-$(RELEASE).tar.gz \
+		src/ tests/ docs/ Makefile .env.example
+	@echo "✓ Paquete: $(DIST)/http-latency-monitor-$(RELEASE).tar.gz"
+
 clean: ## Limpiar archivos generados en el directorio de salida
 	@echo "Limpiando..."
 	@rm -rf $(OUT_DIR)/*
+	@rm -rf $(DIST)
 	@echo "Limpieza completada"
