@@ -1,7 +1,7 @@
 # Bitácora Sprint 1
 
-**Duración:** Días 1-3  
 **Objetivo:** Establecer base de código, configuración por variables de entorno, colector básico HTTP, y prueba representativa.
+**Video Sprint 1:** https://www.youtube.com/watch?v=_uD9H9xt_rI
 
 ---
 
@@ -226,7 +226,6 @@ https://httpbin.org/delay/10,000,0,0,0
 
 ## Próximos pasos (Sprint 2)
 
-- Implementar cálculo de métricas p50/p95/p99
 - Agregar parser con toolkit Unix (awk, sort, etc.)
 - Definir contratos por endpoint
 - Ampliar suite Bats con casos negativos (timeout, 404, 500)
