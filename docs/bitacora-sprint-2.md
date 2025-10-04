@@ -1,4 +1,5 @@
 # Bitácora Sprint 2
+
 **Proyecto:** 1 - Registro de latencias y códigos HTTP con contratos
 **Equipo:** Diego Pineda García, Mateo Torres Fuero
 
@@ -11,13 +12,15 @@
 ## División de Responsabilidades
 
 ### Alumno 1: Diego Pineda - Parser y análisis de métricas
-- **Rama:** `develop`
-- **Responsabilidades:** 
+
+- **Rama:** `scripts/diego-pineda`
+- **Responsabilidades:**
   - Implementación del script `src/parser.sh`
   - Cálculo de métricas estadísticas
   - Generación de reportes con toolkit Unix (awk, sort, uniq)
 
 ### Alumno 2: Mateo Torres - Contratos y testing avanzado
+
 - **Rama:** `test/Mateo` `Makefile/Mateo`
 - **Responsabilidades:**
   - Implementación de `tests/test_contracts.bats`
@@ -33,6 +36,7 @@
 **Propósito:** Analizar CSV de métricas y generar reporte con distribución de códigos HTTP y URLs que exceden umbral de latencia.
 
 **Funcionalidades implementadas:**
+
 - Lectura y procesamiento de `out/raw_metrics.csv`
 - Distribución de códigos HTTP usando `cut`, `sort`, `uniq -c`
 - Detección de URLs que exceden `BUDGET_MS` (umbral configurable)
@@ -40,18 +44,21 @@
 - Generación de reporte en `out/report.txt`
 
 **Decisiones técnicas:**
+
 - Usar `tail -n +2` para saltar header del CSV
 - `cut -d',' -f2` para extraer columna de status codes
 - `awk` para convertir segundos a milisegundos y comparaciones flotantes
 - Variable `BUDGET_MS` configurable vía entorno (default: 500ms)
 
 **Prueba de funcionamiento:**
+
 ```bash
 $ export BUDGET_MS=500
 $ bash src/parser.sh
 ```
 
 **Salida generada en `out/report.txt`:**
+
 ```
 ---Reporte de Analisis---
 
@@ -71,12 +78,14 @@ URLs que exceden umbral de 500ms:
 **Propósito:** Garantizar limpieza de archivos temporales incluso si el script se interrumpe abruptamente.
 
 **Decisiones técnicas:**
+
 - **Decisión:** Usar `trap` para capturar señales EXIT, INT (Ctrl+C), TERM
 - **Justificación:** 12-Factor IX (Disposability) - el proceso debe terminar limpiamente
 - **Implementación:** Función `cleanup()` que elimina archivos temporales de curl
 
 **Código implementado (líneas 8-11):**
-```bash
+
+````bash
 cleanup() {
     rm -f /tmp/curl_format_* 2>/dev/null || true
 }
@@ -97,9 +106,10 @@ run: build
 	@echo ""
 	@echo "=== Resultados ==="
 	@cat $(OUT_DIR)/report.txt
-```
+````
 
 **Prueba de integración:**
+
 ```bash
 $ make clean
 $ make run
@@ -132,11 +142,12 @@ URLs que exceden umbral de 500ms:
 **Tests implementados:**
 
 #### Test 1: Contrato positivo - Google responde exitosamente
+
 ```bash
 @test "contrato: Google debe responder exitosamente (200 o 301)" {
     export TARGETS="https://www.google.com"
     run bash src/collector.sh
-    
+
     [ "$status" -eq 0 ]
     code=$(awk -F',' 'NR==2 {print $2}' "$OUTPUT_FILE")
     [[ "$code" == "200" ]] || [[ "$code" == "301" ]]
@@ -146,11 +157,12 @@ URLs que exceden umbral de 500ms:
 **Justificación:** Google puede responder con 200 (OK) o 301 (redirección permanente) dependiendo de la región.
 
 #### Test 2: Contrato de performance - GitHub debe ser rápido
+
 ```bash
 @test "contrato: GitHub debe ser rapido (< 2s)" {
     export TARGETS="https://github.com"
     run bash src/collector.sh
-    
+
     [ "$status" -eq 0 ]
     latency=$(awk -F',' 'NR==2 {print $3}' "$OUTPUT_FILE")
     (($(echo "$latency < 2.0" | bc -l)))
@@ -160,11 +172,12 @@ URLs que exceden umbral de 500ms:
 **Justificación:** Validar latencia para endpoints críticos.
 
 #### Test 3: Caso negativo - URL 404
+
 ```bash
 @test "contrato negativo: URL 404 debe registrarse correctamente" {
     export TARGETS="https://www.google.com/404"
     run bash src/collector.sh
-    
+
     [ "$status" -eq 0 ]
     grep -q ",404," "$OUTPUT_FILE"
 }
@@ -173,12 +186,13 @@ URLs que exceden umbral de 500ms:
 **Justificación:** Verificar manejo correcto de errores HTTP.
 
 #### Test 4: Caso negativo - Timeout
+
 ```bash
 @test "contrato negativo: timeout no debe detener ejecucion" {
     export TARGETS="https://httpbin.org/delay/10"
     export TIMEOUT=2
     run bash src/collector.sh
-    
+
     [ "$status" -eq 0 ]
     grep -q ",000," "$OUTPUT_FILE"
 }
@@ -191,6 +205,7 @@ URLs que exceden umbral de 500ms:
 ### 5. Actualización del target test [MateoTorres]
 
 **Modificación en Makefile:**
+
 ```makefile
 test: tools
 	@echo "--> Ejecutando suite de pruebas..."
@@ -203,6 +218,7 @@ test: tools
 ```
 
 **Ahora ejecuta todos los tests en `tests/`:**
+
 ```bash
 $ make test
 
@@ -224,6 +240,7 @@ test_contracts.bats
 ## Comandos ejecutados
 
 ### 1. Ejecución completa del pipeline
+
 ```bash
 $ make clean
 Limpiando...
@@ -252,6 +269,7 @@ URLs que exceden umbral de 500ms:
 ---
 
 ### 2. Validación del reporte generado
+
 ```bash
 $ cat out/report.txt
 
@@ -268,6 +286,7 @@ URLs que exceden umbral de 500ms:
 ---
 
 ### 3. Prueba con umbral más bajo
+
 ```bash
 $ export BUDGET_MS=300
 $ bash src/parser.sh
@@ -324,26 +343,31 @@ Los códigos HTTP no exitosos se registran correctamente.
 ## Decisiones técnicas
 
 ### 1. Parser con toolkit Unix
+
 - **Decisión:** Usar `awk`, `cut`, `sort`, `uniq` en lugar de Python/Node.js
 - **Justificación:** Cumple con 12-Factor XI (Logs como streams), procesamiento eficiente de CSVs
 - **Evidencia:** `tail -n +2 "$INPUT_CSV" | cut -d',' -f2 | sort | uniq -c`
 
 ### 2. Conversión de tiempo a milisegundos
+
 - **Decisión:** Usar `awk` para multiplicar por 1000
 - **Justificación:** Formato más legible para humanos (590ms vs 0.59s)
 - **Implementación:** `awk -v t="$time_total" 'BEGIN {printf "%.2f", t * 1000}'`
 
 ### 3. Contratos por endpoint
+
 - **Decisión:** Tests específicos por servicio (Google, GitHub)
 - **Justificación:** Validar comportamiento esperado de servicios externos
 - **Ejemplo:** GitHub debe responder en < 2 segundos
 
 ### 4. Manejo de timeouts
+
 - **Decisión:** Registrar `000` para timeouts, no detener ejecución
 - **Justificación:** Resiliencia del sistema (12-Factor IX: Disposability)
 - **Evidencia:** `if [ $? -eq 0 ]; then ... else echo "...,000,0,0,0"; fi`
 
 ### 5. Configuración de umbral via entorno
+
 - **Decisión:** `BUDGET_MS` configurable (default: 500ms)
 - **Justificación:** 12-Factor III (Config), permite ajustar SLA sin cambiar código
 - **Implementación:** `BUDGET_MS=${BUDGET_MS:-500}`
