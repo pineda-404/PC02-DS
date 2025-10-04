@@ -41,8 +41,13 @@ run: build ## Ejecutar colector de métricas
 	@echo "Generando reporte..."
 	@bash src/parser.sh
 	@echo ""
+	@echo "Calculando percentiles..."
+	@bash src/latencia_percentiles.sh
+	@echo ""
 	@echo "=== Resultados ==="
 	@cat $(OUT_DIR)/report.txt
+	@echo ""
+	@cat $(OUT_DIR)/percentiles.txt
 
 pack: build test ## Generar paquete reproducible en dist/
 	@echo "Generando paquete $(RELEASE)..."
