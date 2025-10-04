@@ -19,8 +19,9 @@ tools: ## Verificar herramientas necesarias
 	@echo "Herramientas OK"
 
 build: ## Preparar directorios de salida para métricas
-	@echo "--> Preparando directorios..."
+	@echo "--> Preparando entorno"
 	@mkdir -p $(OUT_DIR)
+	@echo "Directorio $(OUT_DIR)/ creado"
 
 test: tools ## Ejecutar pruebas automáticas con bats
 	@echo "--> Ejecutando suite de pruebas..."
@@ -44,4 +45,4 @@ run: build ## Ejecutar colector de métricas
 clean: ## Limpiar archivos generados en el directorio de salida
 	@echo "Limpiando..."
 	@rm -rf $(OUT_DIR)/*
-	@echo "Limpieza OK"
+	@echo "Limpieza completada"
